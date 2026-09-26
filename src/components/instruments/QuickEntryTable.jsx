@@ -175,7 +175,7 @@ export default function QuickEntryTable({
 
   return (
     <Card className="bg-white shadow-sm border-slate-200 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 bg-slate-50">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-5 py-3 border-b border-slate-200 bg-slate-50">
         <div>
           <p className="font-semibold text-slate-900">Record today's values</p>
           <p className="text-sm text-slate-500">
@@ -186,7 +186,7 @@ export default function QuickEntryTable({
         <Button
           onClick={handleSaveClick}
           disabled={isSaving}
-          className="bg-slate-900 hover:bg-slate-800"
+          className="bg-slate-900 hover:bg-slate-800 w-full sm:w-auto"
         >
           {isSaving ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -216,7 +216,7 @@ export default function QuickEntryTable({
               return (
                 <div
                   key={row.key}
-                  className="grid grid-cols-[1fr_auto_150px] items-center gap-3 px-5 py-2"
+                  className="grid grid-cols-1 gap-2 px-4 py-3 sm:grid-cols-[1fr_auto_150px] sm:items-center sm:gap-3 sm:px-5 sm:py-2"
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="text-slate-900 truncate">{row.name}</span>
@@ -231,7 +231,7 @@ export default function QuickEntryTable({
                       </Badge>
                     )}
                   </div>
-                  <div className="text-right text-xs text-slate-400 whitespace-nowrap">
+                  <div className="text-left sm:text-right text-xs text-slate-400 whitespace-nowrap">
                     {row.last != null ? (
                       <>
                         was{" "}
@@ -277,7 +277,7 @@ export default function QuickEntryTable({
         )}
       </div>
 
-      <div className="flex items-center justify-between px-5 py-3 border-t border-slate-200 bg-slate-50 text-sm">
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-5 py-3 border-t border-slate-200 bg-slate-50 text-sm">
         <span className="text-slate-500">
           {changedCount} of {totalRows} changed · blanks are skipped
         </span>

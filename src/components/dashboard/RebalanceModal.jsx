@@ -67,7 +67,7 @@ export default function RebalanceModal({
         {hasCash && (
           <div className="py-4 space-y-4">
             {/* Summary cards */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="bg-slate-50 rounded-lg p-3 text-center">
                 <p className="text-xs text-slate-500">Current Holdings</p>
                 <p className="text-lg font-bold text-slate-900">
@@ -89,6 +89,7 @@ export default function RebalanceModal({
             </div>
 
             {/* Allocation table */}
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -156,6 +157,7 @@ export default function RebalanceModal({
                 })}
               </TableBody>
             </Table>
+            </div>
 
             {result.remainingCash > 0.01 && (
               <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">

@@ -156,8 +156,8 @@ export default function AssetClasses() {
   }
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">Asset Classes</h1>
           <p className="text-slate-600 mt-1">Manage your investment categories and target allocations</p>
@@ -343,7 +343,7 @@ export default function AssetClasses() {
             <DialogTitle>Add Instrument to {selectedAssetClass?.name}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleInstrumentSubmit} className="space-y-4 pt-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="inst_name">Instrument Name</Label>
                 <Input

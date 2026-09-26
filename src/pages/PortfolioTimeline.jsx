@@ -344,8 +344,8 @@ export default function PortfolioTimeline() {
   }
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
             Portfolio Timeline
@@ -359,7 +359,7 @@ export default function PortfolioTimeline() {
             {usdRateError ? ` · ${usdRateError}` : ""}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {TIME_PERIODS.map((period) => (
             <Button
               key={period.value}

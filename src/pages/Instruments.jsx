@@ -399,8 +399,8 @@ export default function Instruments() {
   }
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
             Instruments & Assets
@@ -414,7 +414,7 @@ export default function Instruments() {
             {usdRateError ? ` · ${usdRateError}` : ""}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <div className="flex rounded-md border border-slate-200 overflow-hidden mr-2">
             <Button
               type="button"
@@ -454,7 +454,7 @@ export default function Instruments() {
                 onSubmit={handleInstrumentSubmit}
                 className="space-y-4 pt-4"
               >
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="name">Instrument Name</Label>
                     <Input
@@ -653,7 +653,7 @@ export default function Instruments() {
                     className="bg-white shadow-sm border-slate-200"
                   >
                     <CardHeader>
-                      <div className="flex justify-between items-start">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start">
                         <div>
                           <CardTitle className="flex items-center gap-2">
                             {asset.name}
@@ -800,7 +800,7 @@ export default function Instruments() {
                           className="bg-white shadow-sm"
                         >
                           <CardHeader>
-                            <div className="flex justify-between items-start">
+                            <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-start">
                               <div>
                                 <CardTitle>{instrument.name}</CardTitle>
                                 {instrument.symbol && (

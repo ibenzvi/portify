@@ -244,8 +244,8 @@ export default function Dashboard() {
   const investmentPortfolioValue = holdingsValue + freeCash; // Only investments + cash for allocation calculations
 
   return (
-    <div className="p-6 space-y-8">
-      <div className="flex justify-between items-center">
+    <div className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
         <div>
           <h1 className="text-3xl font-bold text-slate-900">
             Portfolio Dashboard
@@ -259,8 +259,8 @@ export default function Dashboard() {
             {usdRateError ? ` · ${usdRateError}` : ""}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="w-56">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4 w-full sm:w-auto">
+          <div className="w-full sm:w-56">
             <Label
               htmlFor="free-cash"
               className="text-sm font-medium text-slate-700"
@@ -277,7 +277,7 @@ export default function Dashboard() {
           </div>
           <Button
             onClick={() => setIsRebalanceModalOpen(true)}
-            className="self-end bg-slate-900 hover:bg-slate-800"
+            className="self-end bg-slate-900 hover:bg-slate-800 w-full sm:w-auto"
           >
             <SlidersHorizontal className="w-4 h-4 mr-2" />
             Rebalance
