@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BarChart3, TrendingUp, PieChart, Briefcase, LogOut, DownloadCloud } from "lucide-react";
+import { BarChart3, TrendingUp, PieChart, Briefcase, LogOut } from "lucide-react";
 import { User } from "@/entities/User";
 import {
   Sidebar,
@@ -39,11 +39,6 @@ const navigationItems = [
     title: "Timeline",
     url: createPageUrl("PortfolioTimeline"),
     icon: TrendingUp,
-  },
-  {
-    title: "Import Data",
-    url: createPageUrl("ImportData"),
-    icon: DownloadCloud,
   }
 ];
 

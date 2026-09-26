@@ -1,5 +1,5 @@
 // Vercel serverless proxy for today's USD->ILS exchange rate.
-// Mirrors api/base44.js. Frankfurter is a free, key-less, ECB-backed API.
+// Frankfurter is a free, key-less, ECB-backed API.
 // Returns { rate, date }. Kept server-side for consistency and to dodge any
 // future CORS changes.
 

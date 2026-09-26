@@ -160,6 +160,6 @@ export const client = {
     ManualAssetValue: makeEntity('ManualAssetValue'),
   },
   auth,
-  // Base44 logged page navigations server-side; we don't need that.
+  // Legacy page logging is disabled.
   appLogs: { logUserInApp: async () => {} },
 };
