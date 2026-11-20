@@ -92,7 +92,7 @@ async function callGemini({ apiKey, systemPrompt, history, userText, image }) {
   if (image) {
     const match = /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/s.exec(image);
     if (match) {
-      parts.push({ inline_data: { mime_type: match[1], data: match[2] } });
+      parts.push({ inlineData: { mimeType: match[1], data: match[2] } });
     }
   }
   const contents = [
@@ -110,7 +110,7 @@ async function callGemini({ apiKey, systemPrompt, history, userText, image }) {
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: systemPrompt }] },
         contents,
-        generationConfig: { response_mime_type: "application/json" },
+        generationConfig: { responseMimeType: "application/json" },
       }),
     },
   );
