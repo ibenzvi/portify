@@ -51,6 +51,7 @@ import Dashboard from './pages/Dashboard';
 import AssetClasses from './pages/AssetClasses';
 import PortfolioTimeline from './pages/PortfolioTimeline';
 import Instruments from './pages/Instruments';
+import Chat from './pages/Chat';
 import __Layout from './Layout.jsx';
 
 
@@ -59,6 +60,7 @@ export const PAGES = {
     "AssetClasses": AssetClasses,
     "PortfolioTimeline": PortfolioTimeline,
     "Instruments": Instruments,
+    "Chat": Chat,
 }
 
 export const pagesConfig = {
