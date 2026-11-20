@@ -3,6 +3,7 @@ name: Keep Supabase Awake
 on:
   schedule:
     # Runs daily at 04:00 UTC to ensure project never reaches the 7-day pause window
+    # NOTE: GitHub auto-disables scheduled workflows after 60 days of repo inactivity; any commit resets it.
     - cron: '0 4 * * *'
   workflow_dispatch:
 
