@@ -3,7 +3,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const M='http://localhost:54399', A='http://localhost:5199';
 const log=async()=>JSON.parse(await (await fetch(M+'/log')).text());
 const results=[];const ok=(n,c,d='')=>{results.push([c?'PASS':'FAIL',n,d]);console.log(c?'PASS':'FAIL',n,d)};
-const b=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox'],headless:'new'});
+const b=await puppeteer.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox'],headless:'new'});
 const p=await b.newPage();await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true,deviceScaleFactor:2});
 const errs=[];p.on('pageerror',e=>errs.push(e.message));
 let chatMode='ok';
