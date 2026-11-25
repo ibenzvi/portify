@@ -140,10 +140,10 @@ export default function PortfolioTimeline() {
     if (holdings.length === 0 && manualAssetValues.length === 0) return [];
 
     const sortedHoldings = [...holdings].sort(
-      (a, b) => parseISO(a.date) - parseISO(b.date),
+      (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime(),
     );
     const sortedManualValues = [...manualAssetValues].sort(
-      (a, b) => parseISO(a.date) - parseISO(b.date),
+      (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime(),
     );
 
     const firstHoldingDate =
@@ -309,6 +309,7 @@ export default function PortfolioTimeline() {
   const formatCurrency = (value) =>
     `₪${Math.round(value || 0).toLocaleString()}`;
 
+  /** @param {{ active?: boolean, payload?: any[], label?: string }} props */
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload || !payload.length) return null;
 
