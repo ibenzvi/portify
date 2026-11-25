@@ -4,6 +4,7 @@ import { AssetClass, Instrument, User } from "@/entities/all";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { Label } from "@/components/ui/label";
 import { Plus, Edit, Trash2, Target } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -15,6 +16,7 @@ const ASSET_COLORS = [
 ];
 
 export default function AssetClasses() {
+  const { toast } = useToast();
   const [assetClasses, setAssetClasses] = useState([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAsset, setEditingAsset] = useState(null);
@@ -115,7 +117,12 @@ export default function AssetClasses() {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this asset class? This will not delete its associated instruments.")) {
-      await AssetClass.delete(id);
+      try {
+        await AssetClass.delete(id);
+      } catch (error) {
+        console.error("Delete asset class failed:", error);
+        toast({ title: "Could not delete. Please try again.", variant: "destructive" });
+      }
       loadData(); // Reload all data after delete
     }
   };
