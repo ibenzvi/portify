@@ -131,7 +131,7 @@ export default function Dashboard() {
     // Calculate Total Return
     if (holdings.length > 0) {
       const sortedHoldings = [...holdings].sort(
-        (a, b) => parseISO(a.date) - parseISO(b.date),
+        (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime(),
       );
       const firstDate = sortedHoldings[0].date;
       const initialValue = sortedHoldings
