@@ -9,7 +9,7 @@ await sleep(5000);
 {const m=start('node',['e2e/mock.mjs']);await sleep(800);
  await new Promise(res=>{const p=spawn('node',['e2e/desktop.mjs'],{stdio:'ignore'});p.on('exit',res)});m.kill();await sleep(300);}
 let failed=0;
-for(const f of (process.env.SUITES||'flows,mobile,crud,chat,desktop').split(',')){
+for(const f of (process.env.SUITES||'flows,mobile,crud,chat,manage,desktop').split(',')){
   const mock=start('node',['e2e/mock.mjs']); // fresh sample data for every suite
   await sleep(800);
   const code=await new Promise(res=>{const p=spawn('node',[`e2e/${f}.mjs`],{stdio:'inherit'});p.on('exit',res)});
