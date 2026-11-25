@@ -1,0 +1,42 @@
+import puppeteer from 'puppeteer-core';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const M='http://localhost:54399',A='http://localhost:5199';
+const log=async()=>JSON.parse(await (await fetch(M+'/log')).text());
+const res=[];const ok=(n,c,d='')=>{res.push(c);console.log(c?'PASS':'FAIL',n,d)};
+await fetch(M+'/set?fail=0');await fetch(M+'/targets?v=50');
+const b=await puppeteer.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox'],headless:'new'});
+const p=await b.newPage();await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
+const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.evaluateOnNewDocument(()=>{localStorage.setItem('sb-localhost-auth-token',JSON.stringify({access_token:'a',refresh_token:'r',token_type:'bearer',expires_in:99999,expires_at:Math.floor(Date.now()/1000)+99999,user:{id:'u1',email:'s@e.com',user_metadata:{}}}))});
+p.on('dialog',d=>d.accept());
+const go=async r=>{await p.goto(A+r,{waitUntil:"networkidle2"});await sleep(800)};
+const rows=()=>p.evaluate(()=>[...document.querySelectorAll('table tbody tr')].length);
+const txt=()=>p.evaluate(()=>document.body.innerText.replace(/\s+/g,' '));
+const clickSel=(sel,i=0)=>p.evaluate((sel,i)=>{const e=document.querySelectorAll(sel)[i];if(!e)return false;e.click();return true},sel,i);
+const clickText=t=>p.evaluate(t=>{const b=[...document.querySelectorAll('button')].find(b=>b.innerText.includes(t));if(!b)return false;b.click();return true},t);
+await go('/Instruments');await clickText('Manage');await sleep(700);await log();
+// Sample Fund A has 5 records (Jul..Nov), Sample Fund B has 2
+let n=await rows();let t=await txt();
+ok('default view shows only the 3 newest records per asset (3 + 2 rows)',n===5,'rows='+n);
+ok('shows "Showing latest 3 of 5" and no toggle for the 2-record asset',t.includes('Showing latest 3 of 5')&&(await p.evaluate(()=>document.querySelectorAll('[data-testid=history-toggle]').length))===1);
+ok('newest records shown, oldest hidden',t.includes('Nov 1, 2026')&&t.includes('Sep 1, 2026')&&!t.includes('Jul 1, 2026'));
+await p.screenshot({path:'/tmp/portify-e2e-g_manage_default.png',fullPage:true});
+await clickSel('[data-testid=history-toggle]');await sleep(300);
+n=await rows();t=await txt();ok('Show all reveals every record (5 + 2 rows)',n===7&&t.includes('Jul 1, 2026'),'rows='+n);
+await p.screenshot({path:'/tmp/portify-e2e-g_manage_all.png',fullPage:true});
+await clickSel('[data-testid=history-toggle]');await sleep(300);ok('Show less returns to 3',(await rows())===5);
+// edit/delete reachable from preview rows
+let L=await log();
+await p.evaluate(()=>document.querySelectorAll('table tbody tr')[0].querySelectorAll('button')[1].click());await sleep(500);
+L=await log();ok('delete on a visible record sends exactly one DELETE (mock only)',L.filter(x=>x.startsWith('DELETE')).length===1,JSON.stringify(L));
+// collapse sections
+await go('/Instruments');await clickText('Manage');await sleep(700);
+const tog=await p.evaluate(()=>document.querySelectorAll('[data-testid=section-toggle]').length);ok('every section has a collapse toggle',tog>=2,'toggles='+tog);
+await clickSel('[data-testid=section-toggle]',1);await sleep(300);
+const vis=()=>p.evaluate(()=>[...document.querySelectorAll('table')].filter(e=>e.offsetParent).length);
+ok('collapsing the first section hides its records',(await vis())===1&&(await p.evaluate(()=>document.querySelectorAll('[data-testid=section-toggle]')[1].getAttribute('aria-expanded')))==='false');
+await p.screenshot({path:'/tmp/portify-e2e-g_manage_collapsed.png',fullPage:true});
+await clickSel('[data-testid=section-toggle]',1);await sleep(300);ok('expanding shows them again',(await vis())===2);
+const ov=await p.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);ok('no horizontal overflow at 390px',ov<=0);
+ok('no JS errors',errs.length===0,errs[0]||'');
+console.log(res.filter(x=>!x).length,'failures of',res.length);await b.close();process.exit(res.every(Boolean)?0:1);
