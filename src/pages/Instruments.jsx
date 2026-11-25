@@ -35,6 +35,7 @@ import {
   PiggyBank,
   Zap,
   LayoutList,
+  ChevronDown,
 } from "lucide-react";
 import {
   Dialog,
@@ -55,6 +56,26 @@ import {
   convertManualValues,
 } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
+
+function HistoryToggle({ total, expanded, onToggle, preview }) {
+  if (total <= preview) return null;
+  return (
+    <div className="mt-3 flex items-center justify-between gap-3 text-sm text-slate-500">
+      <span>
+        {expanded ? `Showing all ${total}` : `Showing latest ${preview} of ${total}`}
+      </span>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        data-testid="history-toggle"
+        onClick={onToggle}
+      >
+        {expanded ? "Show less" : `Show all ${total}`}
+      </Button>
+    </div>
+  );
+}
 
 export default function Instruments() {
   const [instruments, setInstruments] = useState([]);
@@ -79,6 +100,18 @@ export default function Instruments() {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Manage view: sections can be collapsed, histories show the 3 newest records
+  // unless "Show all" is chosen. Only the display changes; no data is touched.
+  const [collapsed, setCollapsed] = useState(() => new Set());
+  const [showAllHistory, setShowAllHistory] = useState(() => new Set());
+  const toggleIn = (setter, key) =>
+    setter((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  const HISTORY_PREVIEW = 3;
   const [mode, setMode] = useState("entry"); // "entry" (fast) | "manage" (cards)
   const { toast } = useToast();
   const {
@@ -397,10 +430,11 @@ export default function Instruments() {
     manualAssets,
     usdRate,
   );
+  const newestFirst = (a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
   const getInstrumentHoldings = (id) =>
-    displayHoldings.filter((h) => h.instrument_id === id);
+    displayHoldings.filter((h) => h.instrument_id === id).sort(newestFirst);
   const getManualAssetValues = (id) =>
-    displayManualValues.filter((v) => v.manual_asset_id === id);
+    displayManualValues.filter((v) => v.manual_asset_id === id).sort(newestFirst);
   const formatCurrency = (amount) =>
     `₪${Math.round(parseFloat(amount) || 0).toLocaleString()}`;
   const groupedInstruments = instruments.reduce((acc, i) => {
@@ -654,11 +688,25 @@ export default function Instruments() {
       {mode === "manage" && (
         <>
           <div>
-            <h2 className="text-2xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-              <PiggyBank className="w-6 h-6" />
-              Manual Assets
+            <h2 className="text-2xl font-bold text-slate-800 mb-4">
+              <button
+                type="button"
+                data-testid="section-toggle"
+                aria-expanded={!collapsed.has("manual")}
+                onClick={() => toggleIn(setCollapsed, "manual")}
+                className="flex w-full items-center gap-2 min-h-11 text-left"
+              >
+                <ChevronDown
+                  className={`w-5 h-5 shrink-0 transition-transform ${collapsed.has("manual") ? "-rotate-90" : ""}`}
+                />
+                <PiggyBank className="w-6 h-6" />
+                Manual Assets
+                <span className="text-sm font-normal text-slate-500">
+                  ({manualAssets.length})
+                </span>
+              </button>
             </h2>
-            <div className="grid gap-6">
+            <div className={`grid gap-6 ${collapsed.has("manual") ? "hidden" : ""}`}>
               {manualAssets.map((asset) => {
                 const values = getManualAssetValues(asset.id);
                 const latestValue = values.length > 0 ? values[0] : null;
@@ -743,7 +791,7 @@ export default function Instruments() {
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {values.map((v) => (
+                                {(showAllHistory.has(asset.id) ? values : values.slice(0, HISTORY_PREVIEW)).map((v) => (
                                   <TableRow key={v.id}>
                                     <TableCell>
                                       {format(new Date(v.date), "MMM d, yyyy")}
@@ -783,6 +831,12 @@ export default function Instruments() {
                               </TableBody>
                             </Table>
                           </div>
+                          <HistoryToggle
+                            total={values.length}
+                            expanded={showAllHistory.has(asset.id)}
+                            onToggle={() => toggleIn(setShowAllHistory, asset.id)}
+                            preview={HISTORY_PREVIEW}
+                          />
                         </div>
                       ) : (
                         <div className="text-center py-8 text-slate-500">
@@ -801,9 +855,23 @@ export default function Instruments() {
             {assetClasses.map((assetClass) => (
               <div key={assetClass.id}>
                 <h2 className="text-2xl font-bold text-slate-800 mb-4">
-                  {assetClass.name}
+                  <button
+                    type="button"
+                    data-testid="section-toggle"
+                    aria-expanded={!collapsed.has(assetClass.id)}
+                    onClick={() => toggleIn(setCollapsed, assetClass.id)}
+                    className="flex w-full items-center gap-2 min-h-11 text-left"
+                  >
+                    <ChevronDown
+                      className={`w-5 h-5 shrink-0 transition-transform ${collapsed.has(assetClass.id) ? "-rotate-90" : ""}`}
+                    />
+                    {assetClass.name}
+                    <span className="text-sm font-normal text-slate-500">
+                      ({(groupedInstruments[assetClass.id] || []).length})
+                    </span>
+                  </button>
                 </h2>
-                <div className="grid gap-6">
+                <div className={`grid gap-6 ${collapsed.has(assetClass.id) ? "hidden" : ""}`}>
                   {(groupedInstruments[assetClass.id] || []).map(
                     (instrument) => {
                       const holdings = getInstrumentHoldings(instrument.id);
@@ -904,7 +972,7 @@ export default function Instruments() {
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                      {holdings.map((h) => (
+                                      {(showAllHistory.has(instrument.id) ? holdings : holdings.slice(0, HISTORY_PREVIEW)).map((h) => (
                                         <TableRow key={h.id}>
                                           <TableCell>
                                             {format(
@@ -945,6 +1013,12 @@ export default function Instruments() {
                                     </TableBody>
                                   </Table>
                                 </div>
+                                <HistoryToggle
+                                  total={holdings.length}
+                                  expanded={showAllHistory.has(instrument.id)}
+                                  onToggle={() => toggleIn(setShowAllHistory, instrument.id)}
+                                  preview={HISTORY_PREVIEW}
+                                />
                               </div>
                             ) : (
                               <div className="text-center py-8 text-slate-500">
