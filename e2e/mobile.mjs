@@ -5,7 +5,7 @@ const log=async()=>JSON.parse(await (await fetch(M+'/log')).text());
 const results=[];const ok=(n,c,d='')=>{results.push(c);console.log(c?'PASS':'FAIL',n,d)};
 await fetch(M+'/set?fail=0');await fetch(M+'/targets?v=50');
 var L;
-const b=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox'],headless:'new'});
+const b=await puppeteer.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox'],headless:'new'});
 const p=await b.newPage();
 const errs=[];p.on('pageerror',e=>errs.push(e.message));
 let chatMode='ok';await p.setRequestInterception(true);
