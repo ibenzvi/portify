@@ -17,11 +17,11 @@ const txt=()=>p.evaluate(()=>document.body.innerText.replace(/\s+/g,' '));
 // viewport matrix
 for(const [w,h,m] of [[320,640,true],[390,844,true],[430,932,true],[1280,800,false]]){
  await p.setViewport({width:w,height:h,isMobile:m,hasTouch:m,deviceScaleFactor:1});
- for(const r of ['/','/Instruments','/AssetClasses','/PortfolioTimeline','/Chat']){
+ for(const r of ['/','/Instruments','/AssetClasses','/Chat']){
   errs.length=0;await p.goto(A+r,{waitUntil:'networkidle2'});await sleep(700);
   const ov=await p.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);
   ok(`${w}px ${r}: no horizontal overflow, no JS errors`,ov<=0&&errs.length===0,`overflow=${ov} ${errs[0]||''}`);
-  if(w===390&&r==='/PortfolioTimeline')await p.screenshot({path:'/tmp/portify-e2e-f_timeline.png',fullPage:true});
+  if(w===390&&r==='/')await p.screenshot({path:'/tmp/portify-e2e-f_dashboard.png',fullPage:true});
   if(w===390&&r==='/Instruments')await p.screenshot({path:'/tmp/portify-e2e-f_instruments.png'});
   if(w===390&&r==='/Chat')await p.screenshot({path:'/tmp/portify-e2e-f_chat.png'});
   if(w===320&&r==='/')await p.screenshot({path:'/tmp/portify-e2e-f_home320.png'});
@@ -30,6 +30,18 @@ await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
 // sidebar nav on mobile
 await p.goto(A+'/',{waitUntil:'networkidle2'});await p.evaluate(()=>document.querySelector('[data-sidebar=trigger]').click());await sleep(600);
 let t=await txt();ok('mobile menu opens with navigation links',/Instruments/.test(t)&&/Asset Classes/i.test(t));await p.screenshot({path:'/tmp/portify-e2e-f_menu.png'});
+const drawerOpen=()=>p.evaluate(()=>!!document.querySelector('[role=dialog][data-sidebar=sidebar],[data-mobile=true]'));
+ok('drawer is open before choosing a tab',await drawerOpen());
+await p.evaluate(()=>[...document.querySelectorAll('a')].find(a=>a.innerText.includes('Instruments')).click());await sleep(900);
+ok('choosing another tab closes the drawer and navigates',!(await drawerOpen())&&p.url().endsWith('/Instruments'));
+await p.evaluate(()=>document.querySelector('[data-sidebar=trigger]').click());await sleep(600);
+ok('drawer reopens',await drawerOpen());
+await p.evaluate(()=>[...document.querySelectorAll('a')].find(a=>a.innerText.includes('Instruments')).click());await sleep(900);
+ok('tapping the current tab also closes the drawer',!(await drawerOpen()));
+await p.evaluate(()=>document.querySelector('[data-sidebar=trigger]').click());await sleep(600);
+ok('no Timeline tab in drawer',!(await txt()).includes('Timeline'));
+await p.keyboard.press('Escape');await sleep(500);
+
 // quick buy/sell invalid input
 await p.goto(A+'/',{waitUntil:'networkidle2'});await sleep(800);await log();
 await clickText('Buy');await sleep(500);L=await log();ok('quick buy with no instrument/amount sends nothing',!L.some(x=>x.startsWith('POST')),JSON.stringify(L));
