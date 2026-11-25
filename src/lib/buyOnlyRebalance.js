@@ -91,12 +91,19 @@ export function calculateBuyOnlyRebalance(assetClasses, freeCash) {
     }
   }
 
+  // Cash actually spent is whatever was assigned to assets. Derive the
+  // remainder from that, so nothing is reported as invested when no asset
+  // received money (e.g. every target is 0%).
+  const totalBought = Object.values(buyAmounts).reduce((s, v) => s + v, 0);
+  cashRemaining = Math.max(0, freeCash - totalBought);
+  const totalAfter = currentTotal + totalBought;
+
   // Build result
   const allocations = assets.map(asset => {
     const buyAmount = buyAmounts[asset.id] || 0;
     const newValue = asset.currentValue + buyAmount;
-    const newPercent = newTotal > 0 ? (newValue / newTotal) * 100 : 0;
-    const currentPercent = newTotal > 0 ? (asset.currentValue / newTotal) * 100 : 0;
+    const newPercent = totalAfter > 0 ? (newValue / totalAfter) * 100 : 0;
+    const currentPercent = totalAfter > 0 ? (asset.currentValue / totalAfter) * 100 : 0;
 
     return {
       id: asset.id,
@@ -115,8 +122,9 @@ export function calculateBuyOnlyRebalance(assetClasses, freeCash) {
   return {
     allocations,
     remainingCash: Math.round(cashRemaining * 100) / 100,
-    totalAfter: newTotal,
+    totalAfter,
     totalBefore: currentTotal,
-    cashInvested: freeCash - Math.round(cashRemaining * 100) / 100,
+    cashInvested: Math.round(totalBought * 100) / 100,
+    noTargets: assets.every((a) => a.targetPercent <= 0),
   };
 }
