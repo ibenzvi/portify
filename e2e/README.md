@@ -1,12 +1,16 @@
 # Portify end-to-end checks (sample data only)
 
 These scripts drive the app in headless Chrome against a local mock of the records API.
-They never touch Supabase or real data.
+They never touch Supabase or real data. The mock holds invented sample records in memory.
 
-    node e2e/mock.mjs &                      # mock backend on :54399
-    VITE_SUPABASE_URL=http://localhost:54399 VITE_SUPABASE_ANON_KEY=k npx vite --port 5199 &
-    npm i --no-save puppeteer-core           # plus a Chrome at /usr/bin/google-chrome
-    node e2e/flows.mjs                       # save/delete/chat/error flows at 390px
-    node e2e/mobile.mjs                      # 320/390/430/1280 overflow, menu, invalid input, chat history/retry/upload
+    npm ci
+    npm run test:e2e        # starts the mock and vite, runs every suite, stops them
 
-Not covered: real Supabase (RLS, row limits, auth), the real /api/chat model, real devices.
+Needs a Chrome or Chromium. Set CHROME_PATH if it is not at /usr/bin/google-chrome.
+Suites: flows (save/delete/chat/error at 390px), mobile (320/390/430/1280 layout, menu, invalid input,
+chat history/retry/upload), crud (quick buy/sell, edit/delete for classes, instruments, manual assets, values),
+chat (upload to review to save, save and delete failures), desktop (1280px layout, screenshots in /tmp).
+
+Not covered: real Supabase (RLS, row limits, auth), the real chat model, real devices.
+Deletes that involve several requests are not atomic. A failure shows an error and reloads the data,
+but it does not roll back requests that already succeeded.
