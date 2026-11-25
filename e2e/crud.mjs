@@ -4,7 +4,7 @@ const M='http://localhost:54399',A='http://localhost:5199';
 const log=async()=>JSON.parse(await (await fetch(M+'/log')).text());
 const res=[];const ok=(n,c,d='')=>{res.push(c);console.log(c?'PASS':'FAIL',n,d)};
 await fetch(M+'/set?fail=0');await fetch(M+'/targets?v=50');
-const b=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',args:['--no-sandbox'],headless:'new'});
+const b=await puppeteer.launch({executablePath:process.env.CHROME_PATH||'/usr/bin/google-chrome',args:['--no-sandbox'],headless:'new'});
 const p=await b.newPage();await p.setViewport({width:390,height:844,isMobile:true,hasTouch:true});
 const errs=[];p.on('pageerror',e=>errs.push(e.message));
 await p.evaluateOnNewDocument(()=>{localStorage.setItem('sb-localhost-auth-token',JSON.stringify({access_token:'a',refresh_token:'r',token_type:'bearer',expires_in:99999,expires_at:Math.floor(Date.now()/1000)+99999,user:{id:'u1',email:'s@e.com',user_metadata:{}}}))});
