@@ -19,12 +19,17 @@ const clickText=(t)=>p.evaluate((t)=>{const b=[...document.querySelectorAll('but
 const txt=()=>p.evaluate(()=>document.body.innerText.replace(/\s+/g,' '));
 await fetch(M+'/set?fail=0');await fetch(M+'/targets?v=50');await log();
 // routes
-for(const r of ['/','/Instruments','/AssetClasses','/PortfolioTimeline','/Chat','/NoSuchPage']){errs.length=0;await go(r);ok('route '+r+' loads without JS errors',errs.length===0,errs[0]||'')}
+for(const r of ['/','/Instruments','/AssetClasses','/Chat','/NoSuchPage']){errs.length=0;await go(r);ok('route '+r+' loads without JS errors',errs.length===0,errs[0]||'')}
 // dashboard
 await go('/');let t=await txt();ok('dashboard shows sample total',t.includes('2,500'));
 await p.type('#free-cash','300');await clickText('Rebalance');await sleep(600);t=await txt();ok('rebalance modal opens',/New Total/i.test(t));await p.screenshot({path:'/tmp/portify-e2e-e_rebalance.png'});await p.keyboard.press('Escape');
-// timeline ranges
-await go('/PortfolioTimeline');for(const l of ['1M','3M','6M','YTD','1Y','3Y','All']){await clickText(l);}t=await txt();ok('timeline range buttons work, Change in Value shown',t.includes('Change in Value')&&!t.includes('Annual Growth'));await p.screenshot({path:'/tmp/portify-e2e-e_timeline.png',fullPage:true});
+// total value chart replaces the timeline; no performance metrics anywhere
+await go('/');await sleep(800);t=await txt();
+ok('dashboard shows Total Value Over Time chart',t.includes('Total Value Over Time')&&await p.evaluate(()=>!!document.querySelector('[data-testid=total-value-chart] svg path.recharts-line-curve')));
+ok('no return/performance/change metrics on dashboard',!/Change in Value|Annual Growth|Best Performer|Biggest Value Growth|Return/i.test(t));
+await p.screenshot({path:'/tmp/portify-e2e-e_dashboard_chart.png',fullPage:true});
+await go('/PortfolioTimeline');t=await txt();ok('old timeline page is gone (404, no timeline content)',/could not be found/.test(t)&&!/Change in Value|Annual Growth|Total Value Over Time/.test(t));
+ok('no Timeline nav link',!(await p.evaluate(()=>[...document.querySelectorAll('a')].some(a=>/Timeline/.test(a.innerText)))));
 // instruments quick save
 await go('/Instruments');await log();
 const inputs=await p.$$('input[type="number"],input[inputmode]');
