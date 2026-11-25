@@ -19,7 +19,7 @@ export default function BuySellWidget({ instruments = [], holdings = [], onActio
     try {
       const instrumentHoldings = holdings
         .filter(h => h.instrument_id === selectedInstrumentId)
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       
       const latestValue = instrumentHoldings.length > 0 ? (instrumentHoldings[0].total_value_ils || 0) : 0;
       const amountFloat = parseFloat(amount) || 0;
