@@ -6,7 +6,7 @@ const LOG=[];let seq=100;
 const D={
  AssetClass:[{id:'ac1',data:{name:'Stocks',target_percent:0}},{id:'ac2',data:{name:'Bonds',target_percent:0}}],
  Instrument:[{id:'i1',data:{name:'Sample Fund A',asset_class_id:'ac1',currency:'ILS'}},{id:'i2',data:{name:'Sample Fund B',asset_class_id:'ac2',currency:'ILS'}}],
- Holding:[{id:'h1',data:{instrument_id:'i1',date:'2026-10-01',total_value_ils:1000}},{id:'h2',data:{instrument_id:'i2',date:'2026-10-01',total_value_ils:500}},{id:'h3',data:{instrument_id:'i1',date:'2026-11-01',total_value_ils:1000}},{id:'h4',data:{instrument_id:'i2',date:'2026-11-01',total_value_ils:1500}}],
+ Holding:[{id:'h1',data:{instrument_id:'i1',date:'2026-10-01',total_value_ils:1000}},{id:'h2',data:{instrument_id:'i2',date:'2026-10-01',total_value_ils:500}},{id:'h3',data:{instrument_id:'i1',date:'2026-11-01',total_value_ils:1000}},{id:'h4',data:{instrument_id:'i2',date:'2026-11-01',total_value_ils:1500}},{id:'h5',data:{instrument_id:'i1',date:'2026-07-01',total_value_ils:800}},{id:'h6',data:{instrument_id:'i1',date:'2026-08-01',total_value_ils:850}},{id:'h7',data:{instrument_id:'i1',date:'2026-09-01',total_value_ils:900}}],
  ManualAsset:[],ManualAssetValue:[]};
 http.createServer((q,s)=>{
  s.setHeader('access-control-allow-origin','*');s.setHeader('access-control-allow-headers','*');s.setHeader('access-control-allow-methods','*');
