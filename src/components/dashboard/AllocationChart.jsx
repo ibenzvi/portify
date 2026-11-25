@@ -18,6 +18,7 @@ export default function AllocationChart({ assetData = [], totalValue = 0 }) {
     return `₪${Math.round(value).toLocaleString()}`;
   };
 
+  /** @param {{ active?: boolean, payload?: any[] }} props */
   const CustomTooltip = ({ active, payload }) => {
     if (!active || !payload || !payload.length) return null;
     
