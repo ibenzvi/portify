@@ -143,7 +143,9 @@ export default function QuickEntryTable({
   );
   const totalRows = manualAssets.length + instruments.length;
 
+  const [formError, setFormError] = React.useState("");
   const handleSaveClick = async () => {
+    setFormError("");
     setIsSaving(true);
     try {
       const today = format(new Date(), "yyyy-MM-dd");
@@ -153,6 +155,10 @@ export default function QuickEntryTable({
         if (raw === "" || raw == null) continue; // skip blanks
         const num = parseFloat(raw);
         if (Number.isNaN(num)) continue;
+        if (num < 0) {
+          setFormError("Values cannot be negative. Nothing was saved.");
+          return;
+        }
         const [kind, id] = key.split(":");
         if (kind === "instrument") {
           // Store the RAW number (dollars for USD instruments); conversion is
@@ -175,7 +181,7 @@ export default function QuickEntryTable({
   if (totalRows === 0) return null;
 
   return (
-    <Card className="bg-white shadow-sm border-slate-200 overflow-hidden">
+    <Card className="bg-white shadow-sm border-slate-200 overflow-hidden mb-20 sm:mb-0">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-5 py-3 border-b border-slate-200 bg-slate-50">
         <div>
           <p className="font-semibold text-slate-900">Record today's values</p>
@@ -187,7 +193,7 @@ export default function QuickEntryTable({
         <Button
           onClick={handleSaveClick}
           disabled={isSaving}
-          className="bg-slate-900 hover:bg-slate-800 w-full sm:w-auto"
+          className="hidden sm:inline-flex bg-slate-900 hover:bg-slate-800 w-auto"
         >
           {isSaving ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -196,8 +202,27 @@ export default function QuickEntryTable({
           )}
           Save all
         </Button>
+        <div className="sm:hidden fixed bottom-0 inset-x-0 z-20 border-t border-slate-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <Button
+            onClick={handleSaveClick}
+            disabled={isSaving}
+            className="bg-slate-900 hover:bg-slate-800 w-full"
+          >
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 mr-2" />
+            )}
+            Save all
+          </Button>
+        </div>
       </div>
 
+      {formError && (
+        <p role="alert" className="px-4 sm:px-5 py-2 text-sm text-red-700 bg-red-50 border-b border-red-100">
+          {formError}
+        </p>
+      )}
       <div className="divide-y divide-slate-100">
         {rows.map((row) =>
           row.type === "header" ? (
