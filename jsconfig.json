@@ -2,9 +2,6 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/components/ui/*": [
-        "./src/types/ui-any.d.ts"
-      ],
       "@/*": [
         "./src/*"
       ]
@@ -30,14 +27,21 @@
     "src/components/**/*.js",
     "src/pages/**/*.jsx",
     "src/Layout.jsx",
-    "src/types/**/*.d.ts"
+    "src/App.jsx",
+    "src/main.jsx",
+    "src/components/Login.jsx",
+    "src/components/UserNotRegisteredError.jsx",
+    "src/components/dashboard/AllocationChart.jsx",
+    "src/lib/AuthContext.jsx",
+    "src/lib/PageNotFound.jsx",
+    "src/lib/query-client.js",
+    "src/pages.config.js"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "src/vite-plugins",
     "src/components/ui",
-    "src/api",
-    "src/lib"
+    "src/api"
   ]
 }
