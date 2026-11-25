@@ -116,9 +116,9 @@ export default function Layout({ children, currentPageName }) {
         </Sidebar>
 
         <main className="flex-1 min-w-0 flex flex-col">
-          <header className="bg-white border-b border-slate-200 px-6 py-4 md:hidden">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger className="hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200" />
+          <header className="bg-white border-b border-slate-200 px-3 py-2 md:hidden">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger aria-label="Open menu" className="h-11 w-11 hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200 [&_svg]:h-6 [&_svg]:w-6" />
               <h1 className="text-xl font-bold text-slate-900">Portfolio Tracker</h1>
             </div>
           </header>
