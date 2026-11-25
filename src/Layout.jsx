@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { BarChart3, TrendingUp, PieChart, Briefcase, LogOut, MessageSquare } from "lucide-react";
+import { BarChart3, PieChart, Briefcase, LogOut, MessageSquare } from "lucide-react";
 import { User } from "@/entities/User";
 import {
   Sidebar,
@@ -16,6 +16,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
   SidebarFooter,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 
@@ -36,16 +37,57 @@ const navigationItems = [
     icon: PieChart,
   },
   {
-    title: "Timeline",
-    url: createPageUrl("PortfolioTimeline"),
-    icon: TrendingUp,
-  },
-  {
     title: "Chat",
     url: createPageUrl("Chat"),
     icon: MessageSquare,
   }
 ];
+
+// Tapping a tab closes the mobile drawer, including the current page's tab
+// (no route change). Route changes close it too.
+function useCloseDrawerOnNavigate() {
+  const { setOpenMobile } = useSidebar();
+  return () => setOpenMobile(false);
+}
+
+function NavLinks({ pathname }) {
+  const closeDrawer = useCloseDrawerOnNavigate();
+  return (
+    <SidebarMenu className="space-y-1">
+      {navigationItems.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton
+            asChild
+            className={`px-3 py-2.5 rounded-lg transition-all duration-200 ${
+              pathname === item.url
+                ? 'bg-slate-900 text-white shadow-sm'
+                : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
+            }`}
+          >
+            <Link to={item.url} onClick={closeDrawer} className="flex items-center gap-3">
+              <item.icon className="w-5 h-5" />
+              <span className="font-medium">{item.title}</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  );
+}
+
+function CloseDrawerOnRouteChange() {
+  const { setOpenMobile } = useSidebar();
+  const { pathname } = useLocation();
+  const first = React.useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    setOpenMobile(false);
+  }, [pathname, setOpenMobile]);
+  return null;
+}
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -60,6 +102,7 @@ export default function Layout({ children, currentPageName }) {
 
   return (
     <SidebarProvider>
+      <CloseDrawerOnRouteChange />
       <div className="min-h-screen flex w-full bg-slate-50">
         <Sidebar className="border-r border-slate-200 bg-white">
           <SidebarHeader className="border-b border-slate-100 p-6">
@@ -80,25 +123,7 @@ export default function Layout({ children, currentPageName }) {
                 Navigation
               </SidebarGroupLabel>
               <SidebarGroupContent>
-                <SidebarMenu className="space-y-1">
-                  {navigationItems.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton 
-                        asChild 
-                        className={`px-3 py-2.5 rounded-lg transition-all duration-200 ${
-                          location.pathname === item.url 
-                            ? 'bg-slate-900 text-white shadow-sm' 
-                            : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
-                        }`}
-                      >
-                        <Link to={item.url} className="flex items-center gap-3">
-                          <item.icon className="w-5 h-5" />
-                          <span className="font-medium">{item.title}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
+                <NavLinks pathname={location.pathname} />
               </SidebarGroupContent>
             </SidebarGroup>
           </SidebarContent>
