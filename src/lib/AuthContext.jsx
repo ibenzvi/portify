@@ -13,12 +13,22 @@ export const AuthProvider = ({ children }) => {
     const applySession = (session) => {
       if (session?.user) {
         // Reuse the same user-shape helper as client.auth.me()
-        client.auth.me().then((me) => {
-          setUser(me);
-          setIsAuthenticated(true);
-          setAuthError(null);
-          setIsLoadingAuth(false);
-        });
+        client.auth
+          .me()
+          .then((me) => {
+            setUser(me);
+            setIsAuthenticated(true);
+            setAuthError(null);
+            setIsLoadingAuth(false);
+          })
+          .catch(() => {
+            // Session vanished between calls: fall back to the login screen
+            // instead of spinning forever.
+            setUser(null);
+            setIsAuthenticated(false);
+            setIsLoadingAuth(false);
+            setAuthError({ type: 'auth_required', message: 'Authentication required' });
+          });
       } else {
         setUser(null);
         setIsAuthenticated(false);
@@ -27,7 +37,10 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    supabase.auth.getSession().then(({ data }) => applySession(data.session));
+    supabase.auth
+      .getSession()
+      .then(({ data }) => applySession(data.session))
+      .catch(() => applySession(null));
 
     const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
       applySession(session);
