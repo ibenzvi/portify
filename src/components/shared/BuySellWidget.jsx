@@ -11,10 +11,17 @@ export default function BuySellWidget({ instruments = [], holdings = [], onActio
   const [selectedInstrumentId, setSelectedInstrumentId] = useState("");
   const [amount, setAmount] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleAction = async (type) => {
     if (!selectedInstrumentId || !amount || !currentUser) return;
+    const requested = parseFloat(amount);
+    if (!Number.isFinite(requested) || requested <= 0) {
+      setErrorMessage("Enter an amount greater than 0. Nothing was saved.");
+      return;
+    }
 
+    setErrorMessage("");
     setIsSubmitting(true);
     try {
       const instrumentHoldings = holdings
@@ -40,6 +47,7 @@ export default function BuySellWidget({ instruments = [], holdings = [], onActio
       }
     } catch (error) {
       console.error(`Error processing ${type} action:`, error);
+      setErrorMessage("Could not save. Please try again.");
     }
     setIsSubmitting(false);
   };
@@ -91,6 +99,7 @@ export default function BuySellWidget({ instruments = [], holdings = [], onActio
               <Minus className="w-4 h-4 mr-2" /> Sell
             </Button>
           </div>
+          {errorMessage && <p role="alert" className="text-sm text-center text-red-600">{errorMessage}</p>}
           {isSubmitting && <p className="text-sm text-center text-slate-500">Processing...</p>}
         </div>
       </CardContent>
