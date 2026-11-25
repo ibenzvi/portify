@@ -45,6 +45,7 @@ export default function Dashboard() {
   const [totalReturn, setTotalReturn] = useState(0);
   const [totalReturnPercent, setTotalReturnPercent] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
+  const [loadError, setLoadError] = useState(null);
   const [manualAssets, setManualAssets] = useState([]);
   const [manualAssetValues, setManualAssetValues] = useState([]);
 
@@ -75,6 +76,7 @@ export default function Dashboard() {
 
   const loadData = async () => {
     setIsLoading(true);
+    setLoadError(null);
     try {
       const user = await client.auth.me();
       if (!user) {
@@ -104,6 +106,7 @@ export default function Dashboard() {
       // processPortfolioData runs in the rate-aware effect above.
     } catch (error) {
       console.error("Error loading data:", error);
+      setLoadError(error?.message || "Unknown error");
     }
     setIsLoading(false);
   };
@@ -241,6 +244,30 @@ export default function Dashboard() {
     return <DashboardSkeleton />;
   }
 
+  if (loadError) {
+    return (
+      <div className="p-4 sm:p-6">
+        <div
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 max-w-xl"
+        >
+          <p className="font-semibold">Couldn't load your portfolio data</p>
+          <p className="text-sm mt-1">
+            The numbers are not shown because the data failed to load, not
+            because the portfolio is empty. ({loadError})
+          </p>
+          <button
+            type="button"
+            onClick={loadData}
+            className="mt-3 rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const investmentPortfolioValue = holdingsValue + freeCash; // Only investments + cash for allocation calculations
 
   return (
@@ -288,7 +315,6 @@ export default function Dashboard() {
       <PortfolioSummary
         totalValue={totalValue}
         totalReturn={totalReturn}
-        totalReturnPercent={totalReturnPercent}
       />
 
       <div className="space-y-8">
