@@ -76,6 +76,7 @@ export default function QuickEntryTable({
 
   // Build the ordered list of rows (manual assets first, then by asset class).
   let inputIndex = -1;
+  /** @type {any[]} */
   const rows = [];
   if (manualAssets.length > 0) {
     rows.push({
