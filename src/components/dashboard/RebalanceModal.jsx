@@ -162,7 +162,11 @@ export default function RebalanceModal({
             {result.remainingCash > 0.01 && (
               <p className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
                 Note: {formatCurrency(result.remainingCash)} could not be
-                allocated (all targets met).
+                allocated (
+                {result.noTargets
+                  ? "no asset class has a target percentage above 0%"
+                  : "all targets met"}
+                ).
               </p>
             )}
           </div>
