@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 
-export default function PortfolioSummary({ totalValue = 0, totalReturn = 0, totalReturnPercent = 0 }) {
+export default function PortfolioSummary({ totalValue = 0, totalReturn = 0 }) {
   const isPositive = totalReturn >= 0;
 
   const formatCurrency = (amount) => {
@@ -34,15 +34,16 @@ export default function PortfolioSummary({ totalValue = 0, totalReturn = 0, tota
             ) : (
               <TrendingDown className="w-4 h-4 text-red-500" />
             )}
-            Total Return
+            Change in Value
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className={`text-2xl font-bold ${isPositive ? 'text-emerald-600' : 'text-red-500'}`}>
             {isPositive ? '+' : ''}{formatCurrency(totalReturn)}
           </div>
-          <p className={`text-sm font-medium ${isPositive ? 'text-emerald-600' : 'text-red-500'}`}>
-            {isPositive ? '+' : ''}{totalReturnPercent.toFixed(2)}%
+          <p className="text-xs text-slate-500 mt-1">
+            Since the first record. Includes money you added or withdrew, so it
+            is not an investment return.
           </p>
         </CardContent>
       </Card>
