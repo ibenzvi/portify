@@ -49,7 +49,6 @@ export default function PortfolioTimeline() {
   const [totalStats, setTotalStats] = useState({
     currentValue: 0,
     totalReturn: 0,
-    annualGrowthRate: 0,
     volatility: 0,
     bestAsset: null,
     worstAsset: null,
@@ -243,13 +242,6 @@ export default function PortfolioTimeline() {
     const initialValue = timeline[0]?.totalValue || 0;
     const totalReturn = currentValue - initialValue;
 
-    // Calculate annualized growth rate
-    const yearsElapsed = timeline.length / 12; // Assuming monthly data
-    const annualGrowthRate =
-      yearsElapsed > 0 && initialValue > 0
-        ? (Math.pow(currentValue / initialValue, 1 / yearsElapsed) - 1) * 100
-        : 0;
-
     // Calculate volatility (standard deviation of monthly returns)
     const returns = [];
     for (let i = 1; i < timeline.length; i++) {
@@ -299,7 +291,6 @@ export default function PortfolioTimeline() {
     setTotalStats({
       currentValue,
       totalReturn,
-      annualGrowthRate: isFinite(annualGrowthRate) ? annualGrowthRate : 0,
       volatility: isFinite(volatility) ? volatility : 0,
       bestAsset,
       worstAsset,
@@ -403,16 +394,19 @@ export default function PortfolioTimeline() {
                 <TrendingUp className="w-5 h-5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-600">Annual Growth</p>
+                <p className="text-sm text-slate-600">Change in Value</p>
                 <p
                   className={`text-2xl font-bold ${
-                    totalStats.annualGrowthRate >= 0
+                    totalStats.totalReturn >= 0
                       ? "text-emerald-600"
                       : "text-red-500"
                   }`}
                 >
-                  {totalStats.annualGrowthRate >= 0 ? "+" : ""}
-                  {totalStats.annualGrowthRate.toFixed(1)}%
+                  {totalStats.totalReturn >= 0 ? "+" : "-"}
+                  {formatCurrency(Math.abs(totalStats.totalReturn))}
+                </p>
+                <p className="text-xs text-slate-500">
+                  Includes money added or withdrawn, not an investment return
                 </p>
               </div>
             </div>
@@ -442,14 +436,14 @@ export default function PortfolioTimeline() {
                 <TrendingUp className="w-5 h-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-600">Best Performer</p>
+                <p className="text-sm text-slate-600">Biggest Value Growth</p>
                 <p className="text-lg font-bold text-purple-600">
                   {totalStats.bestAsset
                     ? `${totalStats.bestAsset.performance >= 0 ? "+" : ""}${totalStats.bestAsset.performance.toFixed(1)}%`
                     : "N/A"}
                 </p>
                 <p className="text-xs text-slate-500">
-                  {totalStats.bestAsset?.name || "-"}
+                  {totalStats.bestAsset?.name || "-"} (includes deposits)
                 </p>
               </div>
             </div>
