@@ -293,9 +293,14 @@ export default function Instruments() {
 
   const handleDeleteInstrument = async (id) => {
     if (window.confirm("Delete instrument and all its holdings?")) {
-      const toDelete = holdings.filter((h) => h.instrument_id === id);
-      await Promise.all(toDelete.map((h) => Holding.delete(h.id)));
-      await Instrument.delete(id);
+      try {
+        const toDelete = holdings.filter((h) => h.instrument_id === id);
+        await Promise.all(toDelete.map((h) => Holding.delete(h.id)));
+        await Instrument.delete(id);
+      } catch (error) {
+        console.error("Delete instrument failed:", error);
+        toast({ title: "Could not delete. Please try again.", variant: "destructive" });
+      }
       loadData();
     }
   };
@@ -321,7 +326,12 @@ export default function Instruments() {
 
   const handleDeleteHoldingClick = async (id) => {
     if (window.confirm("Delete this value entry?")) {
-      await Holding.delete(id);
+      try {
+        await Holding.delete(id);
+      } catch (error) {
+        console.error("Delete value failed:", error);
+        toast({ title: "Could not delete. Please try again.", variant: "destructive" });
+      }
       loadData();
     }
   };
@@ -338,11 +348,16 @@ export default function Instruments() {
 
   const handleDeleteManualAsset = async (id) => {
     if (window.confirm("Delete manual asset and all its values?")) {
-      const toDelete = manualAssetValues.filter(
-        (v) => v.manual_asset_id === id,
-      );
-      await Promise.all(toDelete.map((v) => ManualAssetValue.delete(v.id)));
-      await ManualAsset.delete(id);
+      try {
+        const toDelete = manualAssetValues.filter(
+          (v) => v.manual_asset_id === id,
+        );
+        await Promise.all(toDelete.map((v) => ManualAssetValue.delete(v.id)));
+        await ManualAsset.delete(id);
+      } catch (error) {
+        console.error("Delete manual asset failed:", error);
+        toast({ title: "Could not delete. Please try again.", variant: "destructive" });
+      }
       loadData();
     }
   };
