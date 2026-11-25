@@ -34,6 +34,29 @@ function applySort(query, sort) {
     : query.order(`data->>${field}`, { ascending });
 }
 
+// PostgREST caps each response (1000 rows by default), silently dropping the
+// rest. When no explicit limit is given, read every page so totals, timelines
+// and "latest value" lookups never work from a truncated list. The id
+// tiebreak keeps page boundaries stable when sort values repeat.
+const PAGE_SIZE = 1000;
+
+async function runQuery(query, limit) {
+  if (limit) {
+    const { data, error } = await query.limit(limit);
+    if (error) throw error;
+    return data;
+  }
+  const stable = query.order('id', { ascending: true });
+  const rows = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await stable.range(from, from + PAGE_SIZE - 1);
+    if (error) throw error;
+    rows.push(...data);
+    if (data.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+
 async function currentUserEmail() {
   const { data } = await supabase.auth.getSession();
   if (!data.session) throw new Error('Not authenticated');
@@ -45,10 +68,7 @@ function makeEntity(entityName) {
 
   return {
     async list(sort, limit) {
-      let query = applySort(baseSelect(), sort);
-      if (limit) query = query.limit(limit);
-      const { data, error } = await query;
-      if (error) throw error;
+      const data = await runQuery(applySort(baseSelect(), sort), limit);
       return data.map(rowToObj);
     },
 
@@ -60,10 +80,7 @@ function makeEntity(entityName) {
           ? query.eq(key, value)
           : query.eq(`data->>${key}`, String(value));
       }
-      query = applySort(query, sort);
-      if (limit) query = query.limit(limit);
-      const { data, error } = await query;
-      if (error) throw error;
+      const data = await runQuery(applySort(query, sort), limit);
       return data.map(rowToObj);
     },
 
