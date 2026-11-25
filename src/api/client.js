@@ -148,9 +148,7 @@ const auth = {
   async me() {
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
-      const error = new Error('Not authenticated');
-      error.status = 401;
-      throw error;
+      throw Object.assign(new Error('Not authenticated'), { status: 401 });
     }
     return sessionUserToMe(data.session.user);
   },
