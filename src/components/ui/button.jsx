@@ -21,10 +21,10 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
+        default: "h-11 px-4 py-2 md:h-9",
+        sm: "h-10 rounded-md px-3 text-xs md:h-8",
         lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        icon: "h-11 w-11 md:h-9 md:w-9",
       },
     },
     defaultVariants: {
@@ -34,7 +34,7 @@ const buttonVariants = cva(
   }
 )
 
-const Button = React.forwardRef(({ className, variant, size, asChild = false, ...props }, ref) => {
+const Button = React.forwardRef(/** @param {React.ComponentPropsWithoutRef<'button'> & import('class-variance-authority').VariantProps<typeof buttonVariants> & { asChild?: boolean }} props @param {React.ForwardedRef<HTMLButtonElement>} ref */ ({ className, variant, size, asChild = false, ...props }, ref) => {
   const Comp = asChild ? Slot : "button"
   return (
     (<Comp
