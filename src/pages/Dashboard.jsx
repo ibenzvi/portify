@@ -8,6 +8,7 @@ import {
 } from "@/entities/all";
 import { client } from "@/api/client";
 import PortfolioSummary from "../components/dashboard/PortfolioSummary";
+import TotalValueChart from "../components/dashboard/TotalValueChart";
 import AllocationTable from "../components/dashboard/AllocationTable";
 import BuySellWidget from "../components/shared/BuySellWidget";
 import { Button } from "@/components/ui/button";
@@ -42,8 +43,6 @@ export default function Dashboard() {
   const [manualAssetsValue, setManualAssetsValue] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isRebalanceModalOpen, setIsRebalanceModalOpen] = useState(false);
-  const [totalReturn, setTotalReturn] = useState(0);
-  const [totalReturnPercent, setTotalReturnPercent] = useState(0);
   const [currentUser, setCurrentUser] = useState(null);
   const [loadError, setLoadError] = useState(null);
   const [manualAssets, setManualAssets] = useState([]);
@@ -127,26 +126,6 @@ export default function Dashboard() {
       (sum, h) => sum + (h.total_value_ils || 0),
       0,
     );
-
-    // Calculate Total Return
-    if (holdings.length > 0) {
-      const sortedHoldings = [...holdings].sort(
-        (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime(),
-      );
-      const firstDate = sortedHoldings[0].date;
-      const initialValue = sortedHoldings
-        .filter((h) => h.date === firstDate)
-        .reduce((sum, h) => sum + (h.total_value_ils || 0), 0);
-
-      const returnAmount = currentHoldingsValue - initialValue;
-      const returnPercent =
-        initialValue > 0 ? (returnAmount / initialValue) * 100 : 0;
-      setTotalReturn(returnAmount);
-      setTotalReturnPercent(returnPercent);
-    } else {
-      setTotalReturn(0);
-      setTotalReturnPercent(0);
-    }
 
     const processedInstruments = instruments.map((instrument) => {
       const latestHolding = latestHoldings.get(instrument.id);
@@ -312,9 +291,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <PortfolioSummary
-        totalValue={totalValue}
-        totalReturn={totalReturn}
+      <PortfolioSummary totalValue={totalValue} />
+
+      <TotalValueChart
+        holdings={convertHoldings(holdings, instruments, usdRate)}
+        manualValues={convertManualValues(manualAssetValues, manualAssets, usdRate)}
       />
 
       <div className="space-y-8">
